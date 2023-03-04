@@ -6,13 +6,6 @@ services:
       dockerfile: ./../Docker/backend/Dockerfile
     volumes:
       - ./backend:/backend
-    tty: true
-  test:
-    build: 
-      context: ./backend
-      dockerfile: ./../Docker/test/Dockerfile
-    volumes:
-      - ./backend:/backend
     ports:
       - 4000:8080
     tty: true
