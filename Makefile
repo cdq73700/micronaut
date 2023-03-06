@@ -15,3 +15,9 @@ backend:
 	docker compose exec backend bash
 backend-build:
 	docker compose run --rm backend bash -c "./gradlew shadowJar"
+dokka:
+	docker compose run --rm backend bash -c "./gradlew dokkaHtml"
+format:
+	docker compose run --rm backend bash -c "./gradlew ktlintFormat"
+test:
+	docker compose run --rm backend bash -c "./gradlew test"

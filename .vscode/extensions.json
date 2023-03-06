@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "mathiasfrohlich.kotlin",
+    "mhutchie.git-graph",
+    "streetsidesoftware.code-spell-checker",
+    "donjayamanne.githistory"
+  ]
+}

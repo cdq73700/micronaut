@@ -1,3 +1,2 @@
 
-rootProject.name="backend"
-
+rootProject.name = "backend"

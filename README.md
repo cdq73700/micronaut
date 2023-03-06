@@ -2,14 +2,13 @@
 
 terminal
 
-## ubuntu環境のコピー
+## ubuntu 環境のコピー
 
 ```
 wsl --export Ubuntu-22.04 "C:\wsl\Ubuntu-22.04.tar"
 ```
 
-
-## unbuntu環境の複製
+## unbuntu 環境の複製
 
 ```
 wsl --import Ubuntu-22.04-local-Practice "C:\wsl\Ubuntu-22.04-local-Practice" "C:\wsl\Ubuntu-22.04.tar"
@@ -25,13 +24,13 @@ apt dist-upgrade
 apt autoremove
 ```
 
-## 古いdockerバージョンの削除
+## 古い docker バージョンの削除
 
 ```
 apt-get remove docker docker-engine docker.io containerd runc
 ```
 
-## dockerリポジトリの設定
+## docker リポジトリの設定
 
 ### 必要なパッケージをインストールします。
 
@@ -43,7 +42,7 @@ apt-get install \
     lsb-release
 ```
 
-### Dockerの公式GPGキーを取得する
+### Docker の公式 GPG キーを取得する
 
 ```
 mkdir -p /etc/apt/keyrings
@@ -58,27 +57,27 @@ echo \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
 
-## Dockerのインストール
+## Docker のインストール
 
 ```
 apt-get update
 apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 ```
 
-## ibtablesの整合性の確保
+## ibtables の整合性の確保
 
 ```
 update-alternatives --set iptables /usr/sbin/iptables-legacy
 update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 ```
 
-## makeインストール
+## make インストール
 
 ```
 apt install make
 ```
 
-## dockerサービス開始
+## docker サービス開始
 
 ```
 service docker start
@@ -93,20 +92,20 @@ service docker start
 chmod 600 ./.ssh/id_rsa
 ```
 
-3. gitグローバル設定
+3. git グローバル設定
 
 ```
 git config --global user.name ユーザー名
 git config --global user.email ユーザーメール
 ```
 
-## gitクローン
+## git クローン
 
 ```
 git clone git@github.com:cdq73700/micronaut.git micronaut
 ```
 
-## VSCode実行
+## VSCode 実行
 
 ```
 code .
@@ -123,5 +122,5 @@ make up
 ```
 make backend
 
-./gradlew run --continuous
+./gradlew run -t
 ```

@@ -5,10 +5,10 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Produces
 
-@Controller("/hello") 
-class HelloController {
+@Controller("/api/v1/hoge")
+class HogeController {
 
     @Get
-    @Produces(MediaType.TEXT_PLAIN) 
-    fun index() = "Hello World"
+    @Produces(MediaType.TEXT_PLAIN)
+    fun index() = "HOGE"
 }
