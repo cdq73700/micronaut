@@ -1,3 +1,4 @@
+
 package backend
 
 import io.micronaut.http.HttpRequest
@@ -12,10 +13,20 @@ import org.junit.jupiter.api.Test
 class HelloControllerTest(@Client("/") val client: HttpClient) {
 
     @Test
-    fun testHello() {
-        val request: HttpRequest<Any> = HttpRequest.GET("/hello")
+    fun testHelloV1() {
+        val request = HttpRequest.GET<Any>("/hello")
+        request.header("X-API-VERSION", "1")
         val body = client.toBlocking().retrieve(request)
         assertNotNull(body)
-        assertEquals("Hello World", body)
+        assertEquals("helloV1", body)
+    }
+
+    @Test
+    fun testHelloV2() {
+        val request = HttpRequest.GET<Any>("/hello")
+        request.header("X-API-VERSION", "2")
+        val body = client.toBlocking().retrieve(request)
+        assertNotNull(body)
+        assertEquals("helloV2", body)
     }
 }
