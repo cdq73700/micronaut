@@ -1,11 +1,40 @@
 version: "3.9"
 services:
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: ./../Docker/backend/Dockerfile
     volumes:
       - ./backend:/backend
     ports:
       - 4000:8080
+    tty: true
+  postgres:
+    build:
+      context: .
+      dockerfile: ./Docker/database/Dockerfile
+    volumes:
+      - ./database/data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - TZ=Asia/Tokyo
+    tty: true
+  pgadmin:
+    build:
+      context: .
+      dockerfile: ./Docker/pgadmin/Dockerfile
+    depends_on:
+      - postgres
+    volumes:
+      - ./database/pgadmin:/var/lib/pgadmin4/storage
+    ports:
+      - 8080:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=root@example.com
+      - PGADMIN_DEFAULT_PASSWORD=postgres
+      - TZ=Asia/Tokyo
     tty: true

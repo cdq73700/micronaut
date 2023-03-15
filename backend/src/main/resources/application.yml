@@ -16,3 +16,15 @@ netty:
   default:
     allocator:
       max-order: 3
+datasources:
+  default:
+    url: jdbc:postgresql://postgres:5432/postgres
+    driverClassName: org.postgresql.Driver
+    db-type: postgres
+    username: postgres
+    password: postgres
+    dialect: POSTGRES
+flyway:
+  datasources:
+    default:
+      enabled: true

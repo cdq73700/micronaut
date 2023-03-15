@@ -1,4 +1,4 @@
-.PHONY: backend test
+.PHONY: backend database test
 
 build:
 	docker compose build
@@ -13,6 +13,8 @@ ps:
 	docker compose ps
 backend:
 	docker compose exec backend bash
+database:
+	docker compose exec postgres bash
 backend-build:
 	docker compose run --rm backend bash -c "./gradlew shadowJar"
 dokka:

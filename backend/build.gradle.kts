@@ -26,6 +26,11 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     runtimeOnly("ch.qos.logback:logback-classic")
     implementation("io.micronaut:micronaut-validation")
+    implementation("io.micronaut.data:micronaut-data-jdbc:3.8.6")
+    implementation("io.micronaut.serde:micronaut-serde-jackson:1.5.2")
+    implementation("io.micronaut.flyway:micronaut-flyway:5.5.0")
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari:4.8.0")
+    runtimeOnly("org.postgresql:postgresql:42.5.4")
 
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
