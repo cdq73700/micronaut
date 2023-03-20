@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "esafirm.kotlin-formatter",
+        "fwcd.kotlin",
+        "humao.rest-client",
+        "vscjava.vscode-gradle"
+    ]
+}

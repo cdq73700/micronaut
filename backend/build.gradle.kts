@@ -31,6 +31,7 @@ dependencies {
     implementation("io.micronaut.flyway:micronaut-flyway:5.5.0")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari:4.8.0")
     runtimeOnly("org.postgresql:postgresql:42.5.4")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.3")
 
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
@@ -50,6 +51,7 @@ java {
 
 tasks {
     compileKotlin {
+        dependsOn("ktlintFormat")
         kotlinOptions {
             jvmTarget = "17"
         }
@@ -60,7 +62,7 @@ tasks {
         }
     }
     dokkaHtml.configure {
-        outputDirectory.set(file("$rootDir/dokka"))
+        outputDirectory.set(file("$rootDir/src/main/resources/static/document"))
     }
 }
 graalvmNative.toolchainDetection.set(false)

@@ -14,5 +14,5 @@ out/
 .classpath
 .factorypath
 
-dokka/
+bin/
 log/
