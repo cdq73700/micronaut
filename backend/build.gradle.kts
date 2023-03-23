@@ -32,6 +32,7 @@ dependencies {
     implementation("io.micronaut.sql:micronaut-jdbc-hikari:4.8.0")
     runtimeOnly("org.postgresql:postgresql:42.5.4")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.12.3")
+    implementation("javax:javaee-web-api:8.0.1")
 
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
