@@ -3,8 +3,9 @@ package backend
 import backend.command.BooksUpdateCommand
 import backend.domain.Books
 import backend.exception.BooksException
-import backend.factory.BooksFactory
-import backend.repository.BooksRepository
+import backend.manager.BooksStateManager
+import backend.manager.State
+import backend.service.BooksService
 import com.fasterxml.jackson.core.JsonParseException
 import io.micronaut.core.annotation.ReflectiveAccess
 import io.micronaut.core.convert.exceptions.ConversionErrorException
@@ -27,8 +28,6 @@ import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.scheduling.annotation.ExecuteOn
 import io.swagger.v3.oas.annotations.tags.Tag
 import java.net.URI
-import java.sql.Timestamp
-import java.time.LocalDateTime
 import java.util.UUID
 import javax.validation.Valid
 
@@ -38,7 +37,7 @@ import javax.validation.Valid
 @ExecuteOn(TaskExecutors.IO)
 @Controller("/books")
 @Tag(name = "books")
-open class BooksController(private var booksRepository: BooksRepository) {
+open class BooksController(private var booksService: BooksService, private val stateManager: BooksStateManager) {
 
     /**
      * 指定されたidの書籍情報をレスポンスとして返します。
@@ -47,8 +46,15 @@ open class BooksController(private var booksRepository: BooksRepository) {
      * @return レスポンス
      */
     @Get("/{id}")
-    fun book(id: UUID): Books {
-        return booksRepository.findBookById(id)
+    open fun book(id: UUID): HttpResponse<Books> {
+        val book: Books = booksService.getBook(id)
+        val currentState = stateManager.getCurrentState()
+        return when (currentState) {
+            State.Initial -> HttpResponse.ok()
+            State.Loading -> HttpResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
+            State.Loaded -> HttpResponse.ok(book)
+            State.Error -> HttpResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
     /**
@@ -57,8 +63,15 @@ open class BooksController(private var booksRepository: BooksRepository) {
      * @return レスポンス
      */
     @Get("/")
-    open fun books(@Valid pageable: Pageable): List<Books> {
-        return booksRepository.findAll(pageable).content
+    open fun books(@Valid pageable: Pageable): HttpResponse<List<Books>> {
+        val books: List<Books> = booksService.getBooks(pageable)
+        val currentState = stateManager.getCurrentState()
+        return when (currentState) {
+            State.Initial -> HttpResponse.ok(emptyList())
+            State.Loading -> HttpResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
+            State.Loaded -> HttpResponse.ok(books)
+            State.Error -> HttpResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
     /**
@@ -74,8 +87,14 @@ open class BooksController(private var booksRepository: BooksRepository) {
         @Valid
         body: Books
     ): HttpResponse<Books> {
-        val book: Books = booksRepository.save(BooksFactory.create(title = body.title, createdBy = body.createdBy))
-        return HttpResponse.created(book).headers { headers -> headers.location(book.location) }
+        val book: Books = booksService.save(body)
+        val currentState = stateManager.getCurrentState()
+        return when (currentState) {
+            State.Initial -> HttpResponse.ok()
+            State.Loading -> HttpResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
+            State.Loaded -> HttpResponse.created(book).headers { headers -> headers.location(book.location) }
+            State.Error -> HttpResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
     /**
@@ -93,21 +112,14 @@ open class BooksController(private var booksRepository: BooksRepository) {
         command: BooksUpdateCommand,
         headers: HttpHeaders
     ): HttpResponse<Books> {
-        val oldBook: Books = booksRepository.findBookById(command.id)
-
-        val newBook: Books = oldBook.copy(
-            title = command.title,
-            updatedAt = command.updatedAt,
-            updatedBy = command.updatedBy ?: headers.get(HttpHeaders.USER_AGENT),
-            deletedAt = command.deletedAt ?: oldBook.deletedAt,
-            deletedBy = command.deletedBy ?: oldBook.deletedBy
-        )
-
-        val book = booksRepository.update(newBook)
-
-        return HttpResponse
-            .noContent<Books>()
-            .header(HttpHeaders.LOCATION, book.id.location.path)
+        val book: Books = booksService.update(command, headers)
+        val currentState = stateManager.getCurrentState()
+        return when (currentState) {
+            State.Initial -> HttpResponse.ok()
+            State.Loading -> HttpResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
+            State.Loaded -> HttpResponse.noContent<Books>().header(HttpHeaders.LOCATION, book.id.location.path)
+            State.Error -> HttpResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
     /**
@@ -122,20 +134,14 @@ open class BooksController(private var booksRepository: BooksRepository) {
         id: UUID,
         headers: HttpHeaders
     ): HttpResponse<Books> {
-        val oldBook: Books = booksRepository.findBookById(id)
-
-        val newBook: Books = oldBook.copy(
-            updatedAt = Timestamp.valueOf(LocalDateTime.now()),
-            updatedBy = headers.get(HttpHeaders.USER_AGENT),
-            deletedAt = Timestamp.valueOf(LocalDateTime.now()),
-            deletedBy = headers.get(HttpHeaders.USER_AGENT)
-        )
-
-        val book = booksRepository.update(newBook)
-
-        return HttpResponse
-            .noContent<Books>()
-            .header(HttpHeaders.LOCATION, book.id.location.path)
+        val book: Books = booksService.delete(id, headers)
+        val currentState = stateManager.getCurrentState()
+        return when (currentState) {
+            State.Initial -> HttpResponse.ok()
+            State.Loading -> HttpResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
+            State.Loaded -> HttpResponse.noContent<Books>().header(HttpHeaders.LOCATION, book.id.location.path)
+            State.Error -> HttpResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
     /**
