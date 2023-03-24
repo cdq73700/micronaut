@@ -14,6 +14,6 @@ import io.swagger.v3.oas.annotations.info.Info
 object Application {
     @JvmStatic
     fun main(args: Array<String>) {
-        Micronaut.run(Application::class.java, *args)
+        Micronaut.run(ApplicationFactory::class.java, *args)
     }
 }
