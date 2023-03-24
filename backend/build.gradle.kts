@@ -33,6 +33,8 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql:42.5.4")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.12.3")
     implementation("javax:javaee-web-api:8.0.1")
+    implementation("io.micronaut.openapi:micronaut-openapi:4.8.5")
+    implementation("io.swagger.core.v3:swagger-annotations:2.2.9")
 
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
@@ -44,7 +46,7 @@ subprojects {
 }
 
 application {
-    mainClass.set("backend.ApplicationKt")
+    mainClass.set("backend.Application")
 }
 java {
     sourceCompatibility = JavaVersion.toVersion("17")

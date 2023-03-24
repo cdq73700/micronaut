@@ -25,6 +25,7 @@ import io.micronaut.http.annotation.Put
 import io.micronaut.http.annotation.Status
 import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.scheduling.annotation.ExecuteOn
+import io.swagger.v3.oas.annotations.tags.Tag
 import java.net.URI
 import java.sql.Timestamp
 import java.time.LocalDateTime
@@ -36,6 +37,7 @@ import javax.validation.Valid
  */
 @ExecuteOn(TaskExecutors.IO)
 @Controller("/books")
+@Tag(name = "books")
 open class BooksController(private var booksRepository: BooksRepository) {
 
     /**

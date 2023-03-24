@@ -1,0 +1,303 @@
+openapi: 3.0.1
+info:
+  title: Books API
+  description: backend
+  version: v0.1
+paths:
+  /books:
+    get:
+      tags:
+        - books
+      summary: 書籍情報一覧取得API
+      description: 書籍一覧情報をレスポンスとして返します
+      operationId: books
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Pageable'
+      responses:
+        "200":
+          description: 成功時のレスポンス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Books'
+        "500":
+          description: サーバー側でエラーが発生しました。
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Internal Server Error
+              examples:
+                example:
+                  value:
+                    error:
+                      code: 500
+                      status: Internal Server Error
+                      title: Internal Server Error
+                      detail: An unexpected error occurred
+                    source:
+                      self:
+                        href: /books
+                        templated: false
+    put:
+      tags:
+      - books
+      summary: 書籍情報更新API
+      description: 指定されたidの書籍情報を更新します。
+      operationId: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BooksUpdateCommand'
+        required: true
+      responses:
+        "204":
+          description: 成功時のレスポンス
+          content:
+            application/json:
+              schema:
+                type: object
+                description: No Content
+        "400":
+          description: 無効なリクエストを送信した場合のレスポンス
+          content:
+            application/json:
+              schema:
+                type: object
+                description: BAD_REQUEST
+              examples:
+                example:
+                  value:
+                    error:
+                      code: 400
+                      status: BAD_REQUEST
+                      title: BAD_REQUEST
+                      detail: |-
+                        Unexpected character ('}' (code 125)): was expecting double-quote to start field name
+                         at [Source: UNKNOWN; line: 4, column: 2]
+                    source:
+                      self:
+                        href: /books
+                        templated: false
+        "404":
+          description: 指定されたidの書籍が存在しない場合のレスポンス
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Book not found
+              examples:
+                example:
+                  value:
+                    error:
+                      code: 404
+                      status: NOT_FOUND
+                      title: Book not found
+                      detail: "Book not found with id: UUID"
+                    source:
+                      self:
+                        href: /books
+                        templated: false
+        "500":
+          description: サーバー側でエラーが発生しました。
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Internal Server Error
+              examples:
+                example:
+                  value:
+                    error:
+                      code: 500
+                      status: Internal Server Error
+                      title: Internal Server Error
+                      detail: An unexpected error occurred
+                    source:
+                      self:
+                        href: /books
+                        templated: false
+    post:
+      tags:
+      - books
+      summary: 書籍情報登録API
+      description: 書籍情報を登録します。
+      operationId: save
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Books'
+        required: true
+      responses:
+        "201":
+          description: 成功時のレスポンス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Books'
+        "400":
+          description: 無効なリクエストを送信した場合のレスポンス
+          content:
+            application/json:
+              schema:
+                type: object
+                description: BAD_REQUEST
+              examples:
+                example:
+                  value:
+                    error:
+                      code: 400
+                      status: BAD_REQUEST
+                      title: BAD_REQUEST
+                      detail: |-
+                        Unexpected character ('}' (code 125)): was expecting double-quote to start field name
+                         at [Source: UNKNOWN; line: 4, column: 2]
+                    source:
+                      self:
+                        href: /books
+                        templated: false
+        "500":
+          description: サーバー側でエラーが発生しました。
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Internal Server Error
+              examples:
+                example:
+                  value:
+                    error:
+                      code: 500
+                      status: Internal Server Error
+                      title: Internal Server Error
+                      detail: An unexpected error occurred
+                    source:
+                      self:
+                        href: /books
+                        templated: false
+  /books/{id}:
+    get:
+      tags:
+        - books
+      summary: 書籍情報取得API
+      description: 指定されたidの書籍情報をレスポンスとして返します。
+      operationId: book
+      parameters:
+      - name: id
+        in: path
+        description: UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: 成功時のレスポンス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Books'
+        "404":
+          description: 指定されたidの書籍が存在しない場合のレスポンス
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Book not found
+              examples:
+                example:
+                  value:
+                    error:
+                      code: 404
+                      status: NOT_FOUND
+                      title: Book not found
+                      detail: "Book not found with id: UUID"
+                    source:
+                      self:
+                        href: /books/UUID
+                        templated: false
+        "500":
+          description: サーバー側でエラーが発生しました。
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Internal Server Error
+              examples:
+                example:
+                  value:
+                    error:
+                      code: 500
+                      status: Internal Server Error
+                      title: Internal Server Error
+                      detail: An unexpected error occurred
+                    source:
+                      self:
+                        href: /books/UUID
+                        templated: false
+    delete:
+      tags:
+      - books
+      summary: 書籍情報論理削除API
+      description: 指定されたidの書籍情報を論理削除します。
+      operationId: delete
+      parameters:
+      - name: id
+        in: path
+        description: UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: 成功時のレスポンス
+          content:
+            application/json:
+              schema:
+                type: object
+                description: No Content
+        "404":
+          description: 指定されたidの書籍が存在しない場合のレスポンス
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Book not found
+              examples:
+                example:
+                  value:
+                    error:
+                      code: 404
+                      status: NOT_FOUND
+                      title: Book not found
+                      detail: "Book not found with id: UUID"
+                    source:
+                      self:
+                        href: /books/UUID
+                        templated: false
+        "500":
+          description: サーバー側でエラーが発生しました。
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Internal Server Error
+              examples:
+                example:
+                  value:
+                    error:
+                      code: 500
+                      status: Internal Server Error
+                      title: Internal Server Error
+                      detail: An unexpected error occurred
+                    source:
+                      self:
+                        href: /books
+                        templated: false
