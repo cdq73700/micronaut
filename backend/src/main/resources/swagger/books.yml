@@ -23,7 +23,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Books'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Books'
         "500":
           description: サーバー側でエラーが発生しました。
           content:
