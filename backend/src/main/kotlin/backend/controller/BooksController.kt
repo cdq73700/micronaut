@@ -3,6 +3,7 @@ package backend
 import backend.command.BooksUpdateCommand
 import backend.domain.Books
 import backend.exception.BooksException
+import backend.extension.location
 import backend.manager.BooksStateManager
 import backend.manager.State
 import backend.service.BooksService
@@ -27,7 +28,6 @@ import io.micronaut.http.annotation.Status
 import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.scheduling.annotation.ExecuteOn
 import io.swagger.v3.oas.annotations.tags.Tag
-import java.net.URI
 import java.util.UUID
 import javax.validation.Valid
 
@@ -92,7 +92,7 @@ open class BooksController(private var booksService: BooksService, private val s
         return when (currentState) {
             State.Initial -> HttpResponse.ok()
             State.Loading -> HttpResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
-            State.Loaded -> HttpResponse.created(book).headers { headers -> headers.location(book.location) }
+            State.Loaded -> HttpResponse.created(book).headers { headers -> headers.location(book.location("books")) }
             State.Error -> HttpResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
@@ -117,7 +117,7 @@ open class BooksController(private var booksService: BooksService, private val s
         return when (currentState) {
             State.Initial -> HttpResponse.ok()
             State.Loading -> HttpResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
-            State.Loaded -> HttpResponse.noContent<Books>().header(HttpHeaders.LOCATION, book.id.location.path)
+            State.Loaded -> HttpResponse.noContent<Books>().header(HttpHeaders.LOCATION, book.id.location("books").path)
             State.Error -> HttpResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
@@ -139,24 +139,10 @@ open class BooksController(private var booksService: BooksService, private val s
         return when (currentState) {
             State.Initial -> HttpResponse.ok()
             State.Loading -> HttpResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
-            State.Loaded -> HttpResponse.noContent<Books>().header(HttpHeaders.LOCATION, book.id.location.path)
+            State.Loaded -> HttpResponse.noContent<Books>().header(HttpHeaders.LOCATION, book.id.location("books").path)
             State.Error -> HttpResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
-
-    /**
-     * ロケーション
-     * books/ID
-     */
-    private val UUID?.location: URI
-        get() = URI.create("/books/$this")
-
-    /**
-     * ロケーション
-     * id
-     */
-    private val Books.location: URI
-        get() = id.location
 
     /**
      * エラーハンドル
@@ -165,7 +151,7 @@ open class BooksController(private var booksService: BooksService, private val s
     @Error(exception = Exception::class)
     private fun handleExceptions(request: HttpRequest<*>, exception: Exception): HttpResponse<Map<String, *>> {
         val booksException: BooksException = when (exception) {
-            is ConversionErrorException, is IllegalArgumentException, is JsonParseException ->
+            is NoSuchElementException, is ConversionErrorException, is IllegalArgumentException, is JsonParseException ->
                 BooksException(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.toString(), exception.message.toString())
             is BooksException -> exception
             else -> BooksException(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.toString(), "An unexpected error occurred")
