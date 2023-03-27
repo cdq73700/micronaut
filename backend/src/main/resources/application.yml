@@ -17,6 +17,12 @@ micronaut:
       swagger-ui:
           paths: classpath:META-INF/swagger/views/swagger-ui
           mapping: /swagger-ui/**
+      dokka:
+        paths: classpath:META-INF/dokka
+        mapping: /dokka/**
+      jacoco:
+          paths: classpath:META-INF/jacoco
+          mapping: /jacoco/**
   application:
     name: backend
 netty:

@@ -6,6 +6,7 @@ plugins {
     id("io.micronaut.application") version "3.7.3"
     id("org.jetbrains.dokka") version "1.7.20"
     id("org.jlleitschuh.gradle.ktlint") version "11.3.1"
+    id("jacoco")
 }
 
 version = "0.1"
@@ -51,6 +52,9 @@ application {
 java {
     sourceCompatibility = JavaVersion.toVersion("17")
 }
+jacoco {
+    toolVersion = "0.8.8"
+}
 
 tasks {
     compileKotlin {
@@ -65,9 +69,21 @@ tasks {
         }
     }
     dokkaHtml.configure {
-        outputDirectory.set(file("$rootDir/src/main/resources/static/document"))
+        outputDirectory.set(file("$buildDir/tmp/kapt3/classes/main/META-INF/dokka"))
     }
 }
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(false)
+        csv.required.set(false)
+        html.outputLocation.set(file("$buildDir/tmp/kapt3/classes/main/META-INF/jacoco"))
+    }
+}
+
 graalvmNative.toolchainDetection.set(false)
 micronaut {
     runtime("netty")
