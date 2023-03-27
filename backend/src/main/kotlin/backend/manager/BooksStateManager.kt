@@ -21,13 +21,3 @@ class BooksStateManager {
         return currentState
     }
 }
-
-/**
- * 状態を表す列挙型
- */
-enum class State {
-    Initial,
-    Loading,
-    Loaded,
-    Error
-}
