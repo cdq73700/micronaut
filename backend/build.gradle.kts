@@ -71,16 +71,16 @@ tasks {
     dokkaHtml.configure {
         outputDirectory.set(file("$buildDir/tmp/kapt3/classes/main/META-INF/dokka"))
     }
-}
-tasks.test {
-    finalizedBy(tasks.jacocoTestReport)
-}
-tasks.jacocoTestReport {
-    dependsOn(tasks.test)
-    reports {
-        xml.required.set(false)
-        csv.required.set(false)
-        html.outputLocation.set(file("$buildDir/tmp/kapt3/classes/main/META-INF/jacoco"))
+    test {
+        finalizedBy(jacocoTestReport)
+    }
+    jacocoTestReport {
+        dependsOn(test)
+        reports {
+            xml.required.set(false)
+            csv.required.set(false)
+            html.outputLocation.set(file("$buildDir/tmp/kapt3/classes/main/META-INF/jacoco"))
+        }
     }
 }
 
