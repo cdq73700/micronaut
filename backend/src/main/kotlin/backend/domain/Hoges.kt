@@ -35,7 +35,7 @@ data class Hoges(
     @field:Nullable
     @field:Size(max = 32)
     @field:Schema(description = "作成者")
-    override val createdBy: String = "System",
+    override val createdBy: String? = "System",
 
     @field:Nullable
     @field:Schema(description = "更新日")

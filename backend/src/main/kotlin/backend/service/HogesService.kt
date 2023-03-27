@@ -54,46 +54,67 @@ public class HogesService(private val repository: HogesRepository, private val s
      * Hogeを登録するサービス
      */
     override fun create(data: Hoges, headers: HttpHeaders): Hoges {
-        val createHoge: Hoges = Hoges(title = data.title, createdBy = "test")
-        val hoge: Hoges = repository.save(createHoge)
-        return hoge
+        state.updateState(State.Loading)
+        try {
+            val createHoge: Hoges = Hoges(title = data.title, createdBy = headers.get(HttpHeaders.USER_AGENT).orEmpty())
+            val hoge: Hoges = repository.save(createHoge)
+            state.updateState(State.Loaded)
+            return hoge
+        } catch (e: Exception) {
+            state.updateState(State.Error)
+            throw e
+        }
     }
 
     /**
      * 指定されたidのHogeを更新するサービス
      */
     override fun update(command: HogesUpdateCommand, headers: HttpHeaders): Hoges {
-        val oldHoge: Hoges = find(command.id)
+        state.updateState(State.Loading)
+        try {
+            val oldHoge: Hoges = find(command.id)
 
-        val newHoge: Hoges = oldHoge.copy(
-            title = command.title,
-            updatedAt = command.updatedAt,
-            updatedBy = command.updatedBy ?: headers.get(HttpHeaders.USER_AGENT),
-            deletedAt = command.deletedAt ?: oldHoge.deletedAt,
-            deletedBy = command.deletedBy ?: oldHoge.deletedBy
-        )
+            val newHoge: Hoges = oldHoge.copy(
+                title = command.title,
+                updatedAt = command.updatedAt,
+                updatedBy = command.updatedBy ?: headers.get(HttpHeaders.USER_AGENT),
+                deletedAt = command.deletedAt ?: oldHoge.deletedAt,
+                deletedBy = command.deletedBy ?: oldHoge.deletedBy
+            )
 
-        val hoge = repository.update(newHoge)
+            val hoge = repository.update(newHoge)
+            state.updateState(State.Loaded)
 
-        return hoge
+            return hoge
+        } catch (e: Exception) {
+            state.updateState(State.Error)
+            throw e
+        }
     }
 
     /**
      * 指定されたidのHogeを論理削除するサービス
      */
     override fun delete(id: UUID, headers: HttpHeaders): Hoges {
-        val oldHoge: Hoges = find(id)
+        state.updateState(State.Loading)
+        try {
+            val oldHoge: Hoges = find(id)
 
-        val newHoge: Hoges = oldHoge.copy(
-            updatedAt = Timestamp.valueOf(LocalDateTime.now()),
-            updatedBy = headers.get(HttpHeaders.USER_AGENT),
-            deletedAt = Timestamp.valueOf(LocalDateTime.now()),
-            deletedBy = headers.get(HttpHeaders.USER_AGENT)
-        )
+            val newHoge: Hoges = oldHoge.copy(
+                updatedAt = Timestamp.valueOf(LocalDateTime.now()),
+                updatedBy = headers.get(HttpHeaders.USER_AGENT),
+                deletedAt = Timestamp.valueOf(LocalDateTime.now()),
+                deletedBy = headers.get(HttpHeaders.USER_AGENT)
+            )
 
-        val hoge = repository.update(newHoge)
+            val hoge = repository.update(newHoge)
+            state.updateState(State.Loaded)
 
-        return hoge
+            return hoge
+        } catch (e: Exception) {
+            state.updateState(State.Error)
+            throw e
+        }
     }
 
     /**
