@@ -73,6 +73,7 @@ tasks {
     }
     test {
         finalizedBy(jacocoTestReport)
+        reports.html.destination = file("$buildDir/tmp/kapt3/classes/main/META-INF/test")
     }
     jacocoTestReport {
         dependsOn(test)

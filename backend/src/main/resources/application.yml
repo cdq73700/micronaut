@@ -20,6 +20,9 @@ micronaut:
       dokka:
         paths: classpath:META-INF/dokka
         mapping: /dokka/**
+      test:
+          paths: classpath:META-INF/test
+          mapping: /test/**
       jacoco:
           paths: classpath:META-INF/jacoco
           mapping: /jacoco/**
