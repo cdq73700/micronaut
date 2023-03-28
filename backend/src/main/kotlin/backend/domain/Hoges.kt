@@ -1,7 +1,6 @@
 package backend.domain
 
 import io.micronaut.core.annotation.Nullable
-import io.micronaut.data.annotation.GeneratedValue
 import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
 import io.micronaut.serde.annotation.Serdeable
@@ -19,7 +18,6 @@ import javax.validation.constraints.Size
 @MappedEntity
 data class Hoges(
     @field:Id
-    @field:GeneratedValue(value = GeneratedValue.Type.UUID)
     @field:Schema(description = "UUID")
     override val id: UUID? = UUID.randomUUID(),
 
@@ -55,6 +53,16 @@ data class Hoges(
     @field:Schema(description = "削除者")
     override val deletedBy: String? = null
 ) : IDomain {
+    constructor(id: UUID, title: String, createdBy: String) : this(
+        id,
+        title,
+        Timestamp.valueOf(LocalDateTime.now()),
+        createdBy,
+        Timestamp.valueOf(LocalDateTime.now()),
+        createdBy,
+        null,
+        null
+    )
     constructor(title: String, createdBy: String) : this(
         UUID.randomUUID(),
         title,
