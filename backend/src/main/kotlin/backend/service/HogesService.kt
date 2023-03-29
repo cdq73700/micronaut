@@ -67,6 +67,23 @@ public class HogesService(private val repository: HogesRepository, private val s
     }
 
     /**
+     * Hogeを登録するサービス
+     * id重複テスト用
+     */
+    fun createEx(data: Hoges): Hoges {
+        state.updateState(State.Loading)
+        try {
+            val createHoge: Hoges = Hoges(id = data.id, title = data.title, createdBy = data.createdBy)
+            val hoge: Hoges = repository.save(createHoge)
+            state.updateState(State.Loaded)
+            return hoge
+        } catch (e: Exception) {
+            state.updateState(State.Error)
+            throw e
+        }
+    }
+
+    /**
      * 指定されたidのHogeを更新するサービス
      */
     override fun update(command: HogesUpdateCommand, headers: HttpHeaders): Hoges {
@@ -108,6 +125,25 @@ public class HogesService(private val repository: HogesRepository, private val s
             )
 
             val hoge = repository.update(newHoge)
+            state.updateState(State.Loaded)
+
+            return hoge
+        } catch (e: Exception) {
+            state.updateState(State.Error)
+            throw e
+        }
+    }
+
+    /**
+     * 指定されたidのHogeを物理削除するサービス
+     * テスト用
+     */
+    fun deleteEx(id: UUID): Hoges {
+        state.updateState(State.Loading)
+        try {
+            val hoge: Hoges = find(id)
+
+            repository.delete(id)
             state.updateState(State.Loaded)
 
             return hoge

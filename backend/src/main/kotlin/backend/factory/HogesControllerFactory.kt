@@ -1,6 +1,7 @@
 package backend.factory
 
 import backend.HogesController
+import backend.HogesTestController
 import backend.manager.HogesStateManager
 import backend.service.HogesService
 import io.micronaut.context.annotation.Bean
@@ -18,5 +19,10 @@ public class HogesControllerFactory(
     @Bean
     public fun ControllerFactory(): HogesController {
         return HogesController(service, state)
+    }
+
+    @Bean
+    public fun TestControllerFactory(): HogesTestController {
+        return HogesTestController(service, state)
     }
 }

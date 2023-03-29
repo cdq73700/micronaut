@@ -5,8 +5,6 @@ import backend.domain.Hoges
 import backend.exception.HogesException
 import backend.manager.HogesStateManager
 import backend.service.HogesService
-import com.fasterxml.jackson.core.JsonParseException
-import io.micronaut.core.convert.exceptions.ConversionErrorException
 import io.micronaut.data.model.Pageable
 import io.micronaut.http.HttpHeaders
 import io.micronaut.http.HttpRequest
@@ -115,8 +113,6 @@ open class HogesController(private val service: HogesService, private val state:
     @Error(exception = Exception::class)
     override fun handleExceptions(request: HttpRequest<*>, exception: Exception): HttpResponse<Map<String, *>> {
         val hogesException: HogesException = when (exception) {
-            is NoSuchElementException, is ConversionErrorException, is IllegalArgumentException, is JsonParseException ->
-                HogesException(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.toString(), exception.message.toString())
             is HogesException -> exception
             else -> HogesException(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.toString(), "An unexpected error occurred")
         }

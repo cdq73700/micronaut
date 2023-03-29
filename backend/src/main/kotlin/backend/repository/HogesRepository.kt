@@ -45,4 +45,11 @@ abstract class HogesRepository : PageableRepository<Hoges, UUID> {
      * @return Hoge
      */
     abstract fun update(data: Hoges): Hoges
+
+    /**
+     * Hogeを物理削除しIDを返します。
+     * @param id UUID
+     * @return Void
+     */
+    fun delete(id: UUID) = deleteById(id)
 }
