@@ -26,6 +26,9 @@ micronaut:
       jacoco:
           paths: classpath:META-INF/jacoco
           mapping: /jacoco/**
+      license:
+          paths: classpath:META-INF/licenses
+          mapping: /license/**
   application:
     name: backend
 netty:

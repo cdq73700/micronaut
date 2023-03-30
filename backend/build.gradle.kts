@@ -7,6 +7,7 @@ plugins {
     id("org.jetbrains.dokka") version "1.7.20"
     id("org.jlleitschuh.gradle.ktlint") version "11.3.1"
     id("jacoco")
+    id("com.github.jk1.dependency-license-report") version "2.1"
 }
 
 version = "0.1"
@@ -55,6 +56,9 @@ java {
 jacoco {
     toolVersion = "0.8.8"
 }
+licenseReport {
+    outputDir = "$buildDir/tmp/kapt3/classes/main/META-INF/licenses"
+}
 
 tasks {
     compileKotlin {
@@ -64,12 +68,10 @@ tasks {
         }
     }
     compileTestKotlin {
+        dependsOn("ktlintFormat")
         kotlinOptions {
             jvmTarget = "17"
         }
-    }
-    dokkaHtml.configure {
-        outputDirectory.set(file("$buildDir/tmp/kapt3/classes/main/META-INF/dokka"))
     }
     test {
         finalizedBy(jacocoTestReport)
@@ -77,11 +79,25 @@ tasks {
     }
     jacocoTestReport {
         dependsOn(test)
+        finalizedBy(build)
         reports {
             xml.required.set(false)
             csv.required.set(false)
             html.outputLocation.set(file("$buildDir/tmp/kapt3/classes/main/META-INF/jacoco"))
         }
+    }
+    dokkaHtml.configure {
+        finalizedBy(build)
+        outputDirectory.set(file("$buildDir/tmp/kapt3/classes/main/META-INF/dokka"))
+    }
+    generateLicenseReport {
+        finalizedBy(build)
+    }
+
+    build {
+        dependsOn(dokkaHtml)
+        dependsOn(jacocoTestReport)
+        dependsOn(generateLicenseReport)
     }
 }
 
