@@ -8,6 +8,6 @@ RUN apt-get update \
 WORKDIR /backend
 
 RUN curl -s "https://get.sdkman.io" | bash
-RUN /bin/bash -c "source /root/.sdkman/bin/sdkman-init.sh && sdk install micronaut 3.8.6"
+RUN /bin/bash -c "source /root/.sdkman/bin/sdkman-init.sh && sdk install micronaut 3.8.6 && sdk install kotlin 1.6.10"
 
 COPY . .
