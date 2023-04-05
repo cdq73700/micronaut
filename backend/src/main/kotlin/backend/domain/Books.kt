@@ -49,6 +49,16 @@ data class Books(
     @field:Schema(description = "削除者")
     val deletedBy: String? = null
 ) {
+    constructor(id: UUID, title: String, createdBy: String) : this(
+        id,
+        title,
+        Timestamp.valueOf(LocalDateTime.now()),
+        createdBy,
+        Timestamp.valueOf(LocalDateTime.now()),
+        createdBy,
+        null,
+        null
+    )
     constructor(title: String, createdBy: String) : this(
         UUID.randomUUID(),
         title,

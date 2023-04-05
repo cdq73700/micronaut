@@ -15,6 +15,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.UUID
@@ -24,6 +25,10 @@ import java.util.UUID
  */
 @MicronautTest
 class HogesControllerTest(@Client("/") val client: HttpClient) : ITest<Hoges> {
+
+    /**
+     * 取得
+     */
     override fun testFind(id: UUID) {
         val request: MutableHttpRequest<Hoges> = HttpRequest.GET("/hoges/$id")
         val response: HttpResponse<Hoges> = client.toBlocking().exchange(request, Hoges::class.java)
@@ -31,6 +36,10 @@ class HogesControllerTest(@Client("/") val client: HttpClient) : ITest<Hoges> {
         assertNotNull(response)
         assertEquals(HttpStatus.OK, response.status)
     }
+
+    /**
+     * 一覧取得
+     */
     override fun testFindAll(pageable: Pageable, size: Int) {
         val request: MutableHttpRequest<List<Hoges>> = HttpRequest.GET("/hoges")
         val response: HttpResponse<List<Hoges>> = client.toBlocking().exchange(request, Argument.listOf(Hoges::class.java))
@@ -39,6 +48,10 @@ class HogesControllerTest(@Client("/") val client: HttpClient) : ITest<Hoges> {
         assertEquals(HttpStatus.OK, response.status)
         assertEquals(size, response.body()?.size)
     }
+
+    /**
+     * 作成
+     */
     override fun testCreate(): Hoges {
         val map: Map<String, String> = mapOf("title" to "DevOps")
         val userName: String = "testCreate"
@@ -50,6 +63,10 @@ class HogesControllerTest(@Client("/") val client: HttpClient) : ITest<Hoges> {
 
         return response.body() ?: throw Exception("Hoges is missing!")
     }
+
+    /**
+     * 作成Id指定
+     */
     override fun testCreate(id: UUID): Hoges {
         val idMap: Map<String, Any?> = mapOf("id" to id)
         val titleMap: Map<String, Any?> = mapOf("title" to "DevOps")
@@ -63,6 +80,10 @@ class HogesControllerTest(@Client("/") val client: HttpClient) : ITest<Hoges> {
 
         return response.body() ?: throw Exception("Hoges is missing!")
     }
+
+    /**
+     * 作成Null（Exception）
+     */
     override fun testCreateEx(): HttpClientResponseException {
         val request: MutableHttpRequest<Any> = HttpRequest.POST("/hoges/test", null)
         val thrown: HttpClientResponseException = assertThrows {
@@ -70,6 +91,10 @@ class HogesControllerTest(@Client("/") val client: HttpClient) : ITest<Hoges> {
         }
         return thrown
     }
+
+    /**
+     * 作成error（Exception）
+     */
     override fun testCreateEx(id: UUID?, data: Map<String, Any?>, createdBy: String?): HttpClientResponseException {
         val idMap: Map<String, Any?> = mapOf("id" to id)
         val createdByMap: Map<String, Any?> = mapOf("createdBy" to createdBy)
@@ -79,7 +104,12 @@ class HogesControllerTest(@Client("/") val client: HttpClient) : ITest<Hoges> {
             client.toBlocking().exchange(request, Hoges::class.java)
         }
         return thrown
-    } override fun testUpdate(domain: Hoges): Hoges {
+    }
+
+    /**
+     * 更新
+     */
+    override fun testUpdate(domain: Hoges): Hoges {
         val title: String = "update title"
         val map: Map<String, String> = mapOf("id" to domain.id.toString(), "title" to title)
         val userName: String = "testUpdate"
@@ -103,6 +133,10 @@ class HogesControllerTest(@Client("/") val client: HttpClient) : ITest<Hoges> {
 
         return newHoge
     }
+
+    /**
+     * 論理削除
+     */
     override fun testLogicDelete(domain: Hoges): Hoges {
         val userName: String = "testLogicDelete"
         val request: MutableHttpRequest<Hoges> = HttpRequest.DELETE<Hoges>("/hoges/" + domain.id.toString()).header(HttpHeaders.USER_AGENT, userName)
@@ -125,6 +159,10 @@ class HogesControllerTest(@Client("/") val client: HttpClient) : ITest<Hoges> {
 
         return newHoge
     }
+
+    /**
+     * 物理削除
+     */
     override fun testPhysicsDelete(id: UUID) {
         val request: MutableHttpRequest<Hoges> = HttpRequest.DELETE<Hoges>("/hoges/test/" + id.toString())
         val response: HttpResponse<Hoges> = client.toBlocking().exchange(request, Hoges::class.java)
@@ -241,6 +279,7 @@ class HogesControllerTest(@Client("/") val client: HttpClient) : ITest<Hoges> {
      * hoge Operations
      */
     @Test
+    @DisplayName("オペレーションテスト")
     fun testHogesCrudOperations() {
         var hoge: Hoges = testCreate()
         var id: UUID = hoge.id ?: throw Exception("id is missing!")
