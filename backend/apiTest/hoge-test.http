@@ -1,0 +1,41 @@
+GET http://localhost:8080/hoges HTTP/1.1
+
+###
+
+GET http://localhost:8080/hoges/b0fc5631-5db7-4bd8-8109-fb7d17bf4f47 HTTP/1.1
+
+###
+
+PUT http://localhost:8080/hoges HTTP/1.1
+content-type: application/json
+
+{
+    "id": "b0fc5631-5db7-4bd8-8109-fb7d17bf4f47",
+    "title": "test6"
+}
+
+###
+
+POST http://localhost:8080/hoges HTTP/1.1
+content-type: application/json
+
+{
+    "title": "test3"
+}
+
+###
+
+//ユニットテスト用通常ではアクセス不可
+POST http://localhost:8080/hoges/test HTTP/1.1
+content-type: application/json
+
+{
+    "id": "128c4a82-ea1c-4784-837e-2c38e8e7b608",
+    "title": "test3"
+}
+
+###
+
+DELETE http://localhost:8080/hoges/b0fc5631-5db7-4bd8-8109-fb7d17bf4f47 HTTP/1.1
+content-type: application/json
+

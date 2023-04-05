@@ -1,0 +1,31 @@
+GET http://localhost:8080/books HTTP/1.1
+
+###
+
+GET http://localhost:8080/books/d58e6ee7-49db-4c76-aaf3-bf8596a5fd11 HTTP/1.1
+
+###
+
+PUT http://localhost:8080/books HTTP/1.1
+content-type: application/json
+
+{
+    "id": "b0fc5631-5db7-4bd8-8109-fb7d17bf4f47",
+    "title": "test6"
+}
+
+###
+
+POST http://localhost:8080/books HTTP/1.1
+content-type: application/json
+
+{
+    "title": "test3",
+    "createdBy": "テスト"
+}
+
+###
+
+DELETE http://localhost:8080/books/b0fc5631-5db7-4bd8-8109-fb7d17bf4f47 HTTP/1.1
+
+content-type: application/json
