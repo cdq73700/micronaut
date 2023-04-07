@@ -12,3 +12,32 @@
 - [Micronaut HTTP Client documentation](https://docs.micronaut.io/latest/guide/index.html#httpClient)
 
 
+## swagger
+
+```
+http://localhost:4000/swagger-ui
+```
+
+## dokka
+
+```
+http://localhost:4000/dokka/index.html
+```
+
+## test
+
+```
+http://localhost:4000/test/index.html
+```
+
+## jacoco
+
+```
+http://localhost:4000/test/index.html
+```
+
+## license
+
+```
+http://localhost:4000/license/index.html
+```
