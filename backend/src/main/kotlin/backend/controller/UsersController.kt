@@ -1,83 +1,122 @@
 package backend
 
-import io.micronaut.data.exceptions.DataAccessException
+import backend.command.UsersUpdateCommand
+import backend.domain.Users
+import backend.exception.UsersException
+import backend.manager.UsersStateManager
+import backend.service.UsersService
 import io.micronaut.data.model.Pageable
 import io.micronaut.http.HttpHeaders
+import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Delete
+import io.micronaut.http.annotation.Error
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
-import io.micronaut.http.annotation.Status
 import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.scheduling.annotation.ExecuteOn
-import java.net.URI
-import java.util.Optional
+import io.swagger.v3.oas.annotations.tags.Tag
+import java.util.UUID
 import javax.validation.Valid
-import javax.validation.constraints.NotBlank
 
+/**
+ * Usersコントローラー
+ */
 @ExecuteOn(TaskExecutors.IO)
 @Controller("/users")
-open class UsersController(private val usersRepository: UsersRepository) {
-    @Get("/{id}")
-    fun show(id: Int): Optional<Users> = usersRepository.findById(id)
+@Tag(name = "users")
+open class UsersController(private val service: UsersService, private val state: UsersStateManager) : IController<Users, UsersUpdateCommand> {
 
-    @Put
-    open fun update(
+    /**
+     * 指定されたidのUserをレスポンスとして返します。
+     *
+     * @param id UUID
+     * @return レスポンス
+     */
+    @Get("/{id}")
+    override fun find(id: UUID): HttpResponse<Users> {
+        val user: Users = service.find(id)
+        val currentState = state.getCurrentState()
+        return service.rtnResponse<Users>(user, currentState)
+    }
+
+    /**
+     * User一覧をレスポンスとして返します。
+     *
+     * @return レスポンス
+     */
+    @Get("/")
+    override fun findAll(pageable: Pageable): HttpResponse<List<Users>> {
+        val users: List<Users> = service.findAll(pageable)
+        val currentState = state.getCurrentState()
+        return service.rtnResponse<List<Users>>(users, currentState)
+    }
+
+    /**
+     * Userを登録します。
+     *
+     * @param name User名
+     * @param createdBy 作成者
+     * @return レスポンス
+     */
+    @Post
+    override fun create(
         @Body
         @Valid
-        command: UsersUpdateCommand
+        body: Users,
+        headers: HttpHeaders
     ): HttpResponse<Users> {
-        val id = usersRepository.update(command.id, command.name)
-
-        return HttpResponse
-            .noContent<Users>()
-            .header(HttpHeaders.LOCATION, id.location.path)
+        val user: Users = service.create(body, headers)
+        val currentState = state.getCurrentState()
+        return service.rtnResponse<Users>(user, currentState)
     }
 
-    @Get("/list")
-    open fun list(@Valid pageable: Pageable): List<Users> = usersRepository.findAll(pageable).content
-
-    @Post
-    open fun save(
-        @Body("name")
-        @NotBlank
-        name: String
-    ): HttpResponse<Users> {
-        val Users = usersRepository.save(name)
-
-        return HttpResponse
-            .created(Users)
-            .headers { headers -> headers.location(Users.location) }
-    }
-
-    @Post("/ex")
-    open fun saveExceptions(
+    /**
+     * 指定されたidのUserを更新します。
+     *
+     * @param id UUID
+     * @param name 書籍名
+     * @return レスポンス
+     */
+    @Put
+    override fun update(
         @Body
-        @NotBlank
-        name: String
+        @Valid
+        command: UsersUpdateCommand,
+        headers: HttpHeaders
     ): HttpResponse<Users> {
-        return try {
-            val Users = usersRepository.saveWithException(name)
-
-            HttpResponse
-                .created(Users)
-                .headers { headers -> headers.location(Users.location) }
-        } catch (ex: DataAccessException) {
-            HttpResponse.noContent()
-        }
+        val user: Users = service.update(command, headers)
+        val currentState = state.getCurrentState()
+        return service.rtnResponse<Users>(user, currentState)
     }
 
+    /**
+     * 指定されたidのUserを論理削除します。
+     *
+     * @param id UUID
+     * @return レスポンス
+     */
     @Delete("/{id}")
-    @Status(HttpStatus.NO_CONTENT)
-    fun delete(id: Int) = usersRepository.deleteById(id)
+    override fun delete(id: UUID, headers: HttpHeaders): HttpResponse<Users> {
+        val user: Users = service.delete(id, headers)
+        val currentState = state.getCurrentState()
+        return service.rtnResponse<Users>(user, currentState)
+    }
 
-    private val Int?.location: URI
-        get() = URI.create("/users/$this")
-
-    private val Users.location: URI
-        get() = id.location
+    /**
+     * エラーハンドル
+     */
+    @Error(exception = Exception::class)
+    override fun handleExceptions(request: HttpRequest<*>, exception: Exception): HttpResponse<Map<String, *>> {
+        val usersException: UsersException = when (exception) {
+            is UsersException -> exception
+            else -> UsersException(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.toString(), "An unexpected error occurred")
+        }
+        val json: Map<String, *> = usersException.createMessage(request.uri)
+        return HttpResponse.status<Map<String, *>>(usersException.status).body(json)
+    }
 }

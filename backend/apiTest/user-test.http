@@ -1,0 +1,41 @@
+GET http://localhost:8080/users HTTP/1.1
+
+###
+
+GET http://localhost:8080/users/d419f58a-a20d-4bfa-95fc-f083452208d8 HTTP/1.1
+
+###
+
+PUT http://localhost:8080/users HTTP/1.1
+content-type: application/json
+
+{
+    "id": "d419f58a-a20d-4bfa-95fc-f083452208d8",
+    "name": "test6"
+}
+
+###
+
+POST http://localhost:8080/users HTTP/1.1
+content-type: application/json
+
+{
+    "name": "test3"
+}
+
+###
+
+//ユニットテスト用通常ではアクセス不可
+POST http://localhost:8080/users/test HTTP/1.1
+content-type: application/json
+
+{
+    "id": "128c4a82-ea1c-4784-837e-2c38e8e7b608",
+    "name": "test3"
+}
+
+###
+
+DELETE http://localhost:8080/users/d419f58a-a20d-4bfa-95fc-f083452208d8 HTTP/1.1
+content-type: application/json
+

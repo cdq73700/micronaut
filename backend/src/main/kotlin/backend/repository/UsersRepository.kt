@@ -1,22 +1,55 @@
-package backend
+package backend.repository
 
-import io.micronaut.data.annotation.Id
-import io.micronaut.data.exceptions.DataAccessException
+import backend.domain.Users
+import backend.exception.UsersException
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.PageableRepository
-import javax.transaction.Transactional
-import javax.validation.constraints.NotBlank
+import io.micronaut.http.HttpStatus
+import java.util.Optional
+import java.util.UUID
 
+/**
+ * Usersレポジトリ
+ */
 @JdbcRepository(dialect = Dialect.POSTGRES)
-abstract class UsersRepository : PageableRepository<Users, Int> {
-    abstract fun save(@NotBlank name: String): Users
+abstract class UsersRepository : PageableRepository<Users, UUID> {
 
-    @Transactional
-    open fun saveWithException(@NotBlank name: String): Users {
-        save(name)
-        throw DataAccessException("test exception")
+    /**
+     * 指定されたidのHogeを返します。
+     *
+     * @param id UUID
+     * @return User
+     */
+    fun find(id: UUID): Users {
+        val user: Optional<Users> = findById(id)
+        if (user.isPresent) {
+            return user.get()
+        } else {
+            throw UsersException(HttpStatus.NOT_FOUND, "User not found", "User not found with id: $id")
+        }
     }
 
-    abstract fun update(@Id id: Int, @NotBlank name: String): Int
+    /**
+     * Userを登録しHogeを返します。
+     *
+     * @param Users User
+     * @return User
+     */
+    abstract fun save(data: Users): Users
+
+    /**
+     * Userを更新しUserを返します。
+     *
+     * @param Users User
+     * @return User
+     */
+    abstract fun update(data: Users): Users
+
+    /**
+     * Userを物理削除しIDを返します。
+     * @param id UUID
+     * @return Void
+     */
+    fun delete(id: UUID) = deleteById(id)
 }
