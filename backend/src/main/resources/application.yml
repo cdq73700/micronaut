@@ -37,11 +37,11 @@ netty:
       max-order: 3
 datasources:
   default:
-    url: jdbc:postgresql://postgres:5432/postgres
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_TABLE}
     driverClassName: org.postgresql.Driver
     db-type: postgres
-    username: postgres
-    password: postgres
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     dialect: POSTGRES
 flyway:
   datasources:
